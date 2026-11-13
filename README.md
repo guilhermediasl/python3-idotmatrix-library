@@ -1,5 +1,41 @@
+> [!IMPORTANT]
+> **This is a maintained fork** of [derkalle4/python3-idotmatrix-library](https://github.com/derkalle4/python3-idotmatrix-library), which was archived in June 2025. All credit for the reverse-engineered protocol goes to the original authors and contributors. This fork stays API-compatible with 0.0.9 and adds a persistent Bluetooth connection (see below).
+
+## Fork: persistent connection (0.1.0)
+
+Connecting for every update makes the display show its blinking Bluetooth icon before each new image. `MatrixClient` keeps one BLE connection open on a background thread and reuses it, with a plain synchronous API:
+
+```python
+from idotmatrix import MatrixClient
+
+matrix = MatrixClient("E9:BA:C7:6F:AB:41")
+matrix.set_brightness(80)
+matrix.set_image("frame.png")      # PNG, sent as-is (or pass pixel_size=32 to resize)
+matrix.set_gif("animation.gif")
+matrix.reset()
+matrix.close()                     # release the link on shutdown
+```
+
+It is built for long-running apps (e.g. a Raspberry Pi service):
+
+- Reconnects automatically when the link drops, and restores the last brightness.
+- On Linux, releases a stale BlueZ connection left by a previous process that died while connected (a connected device stops advertising and cannot be found otherwise).
+- Enters DIY image mode only once per connection, so images change without a black flash.
+- Uses acknowledged writes, so a dead link raises and is retried instead of silently dropping the image, and reads the negotiated MTU on BlueZ (Bleak otherwise assumes 20-byte writes).
+- Raises `DeviceNotFoundError` quickly when the display is off instead of blocking for minutes.
+
+Install:
+
+```bash
+pip install "idotmatrix @ git+https://github.com/guilhermediasl/python3-idotmatrix-library@v0.1.0"
+```
+
+Other changes in 0.1.0: `idotmatrix.payloads` builds protocol payloads without a connection; the package no longer calls `logging.basicConfig(level=DEBUG)` on import; `ConnectionManager.send` no longer blocks the event loop; `setup.py` builds from source without importing the package; the obsolete `asyncio` PyPI dependency was dropped. Run the tests with `pytest tests`.
+
+---
+
 > [!NOTE]  
-> Due to a long-term health condition (post-COVID since almost three years), I am unable to continue developing this project. Although many amazing contributors have helped over the years, I am unsure when I will be able to resume work. This is my most popular project (over 61 stars!), and I hope others will continue to improve the client and library for various use cases, such as Home Assistant integration. Thank you for your understanding and support.
+> Original author's note: Due to a long-term health condition (post-COVID since almost three years), I am unable to continue developing this project. Although many amazing contributors have helped over the years, I am unsure when I will be able to resume work. This is my most popular project (over 61 stars!), and I hope others will continue to improve the client and library for various use cases, such as Home Assistant integration. Thank you for your understanding and support.
 
 <br/>
 <p align="center">

@@ -1,10 +1,16 @@
+import re
 from pathlib import Path
-from idotmatrix.version import __version__
+
 from setuptools import setup, find_packages
 
-# read the contents of your README file
 this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text()
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
+# Read the version without importing the package: importing it would pull in
+# bleak/pillow, which are not installed yet in pip's isolated build env.
+__version__ = re.search(
+    r'__version__\s*=\s*"([^"]+)"',
+    (this_directory / "idotmatrix" / "version.py").read_text(encoding="utf-8"),
+).group(1)
 
 setup(
     name="idotmatrix",
@@ -12,23 +18,25 @@ setup(
     description="configure any iDotMatrix compatible 16x16 or 32x32 pixel display without the chinese iDotMatrix android / iOS app.",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url="https://github.com/derkalle4/python3-idotmatrix-library",
+    url="https://github.com/guilhermediasl/python3-idotmatrix-library",
     author="Kalle Minkner",
     author_email="info@kalleminkner.de",
+    maintainer="Guilherme Dias de Andrade Lima",
     license="GPLv3",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests", "tests.*"]),
+    python_requires=">=3.8",
     install_requires=[
-        "asyncio",
-        "bleak",
+        "bleak>=0.22",
         "pillow",
         "cryptography",
     ],
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: POSIX :: Linux",
+        "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
     ],
 )

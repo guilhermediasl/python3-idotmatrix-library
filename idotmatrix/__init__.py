@@ -21,6 +21,7 @@ from .modules.scoreboard import Scoreboard
 from .modules.system import System
 from .modules.text import Text
 from .modules.effect import Effect
+from .persistentClient import MatrixClient, DeviceNotFoundError
 
 
 __author__ = "Kalle Minkner, Jon-Mailes Graeffe"
@@ -43,4 +44,6 @@ __all__ = [
     "System",
     "Text",
     "Effect",
+    "MatrixClient",
+    "DeviceNotFoundError",
 ]
